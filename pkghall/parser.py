@@ -48,10 +48,10 @@ def parse_requirements(source: str) -> list[str]:
     packages: list[str] = []
     for raw_line in source.splitlines():
         line = raw_line.strip()
-        if not line or line.startswith(("#", "-", "git+", "http")):
+        if not line or line.startswith(("#", "-", "git+", "http", "--")):
             continue
-        # strip extras, version specifiers, environment markers
-        m = re.match(r"^([A-Za-z0-9]([A-Za-z0-9._-])*)", line)
+        # PEP 508: package names must start with a letter (not a digit)
+        m = re.match(r"^([A-Za-z]([A-Za-z0-9._-])*)", line)
         if m:
             packages.append(m.group(0))
     return sorted(set(packages))
@@ -85,7 +85,10 @@ def parse_file(path: Path) -> tuple[list[str], str]:
 
 
 def parse_stdin(content: str) -> tuple[list[str], str]:
-    """Parse piped stdin — try requirements format first, then Python."""
+    """Parse piped stdin — detect Python source vs requirements format."""
+    # If there are any import statements, treat as Python source
+    if re.search(r"^(?:import|from)\s+\w", content, re.MULTILINE):
+        return parse_python_imports(content), "python"
     pkgs = parse_requirements(content)
     if pkgs:
         return pkgs, "requirements"

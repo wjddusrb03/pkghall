@@ -17,9 +17,9 @@ PYPI_STATS_URL = "https://pypistats.org/api/packages/{package}/recent"
 # Patterns that commonly appear in LLM hallucinations
 _HALLUCINATION_PATTERNS = [
     re.compile(r"-(utils?|helpers?|extras?|tools?|plus|pro|lite|mini|v\d)$", re.I),
-    re.compile(r"^(langchain|openai|anthropic|fastapi|django|flask)-\w+-\w+$", re.I),
-    re.compile(r"^ai[-_]\w+$", re.I),
-    re.compile(r"^llm[-_]\w+$", re.I),
+    re.compile(r"^(langchain|openai|anthropic|fastapi|django|flask)-\w+(-\w+)+$", re.I),
+    re.compile(r"^ai[-_]", re.I),
+    re.compile(r"^llm[-_]", re.I),
 ]
 
 

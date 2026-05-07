@@ -1,0 +1,17 @@
+- id: pkghall-check
+  name: pkghall — check requirements files
+  description: Detect hallucinated packages in requirements*.txt files
+  language: python
+  entry: pkghall check
+  args: [--quiet]
+  files: "requirements.*\\.txt$"
+  pass_filenames: true
+
+- id: pkghall-scan
+  name: pkghall — scan Python files
+  description: Detect hallucinated imports in Python source files
+  language: python
+  entry: pkghall scan
+  args: [--quiet]
+  types: [python]
+  pass_filenames: true
