@@ -17,8 +17,8 @@ console = Console(legacy_windows=False, highlight=False)
 
 def run_watch(root: Path, quiet: bool) -> None:
     try:
-        from watchdog.observers import Observer
         from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
     except ImportError:
         console.print(
             "[red]Watch mode requires the 'watchdog' package.[/red]\n"
@@ -27,7 +27,7 @@ def run_watch(root: Path, quiet: bool) -> None:
         raise SystemExit(1)
 
     from .checker import check_packages
-    from .parser import parse_file, is_parseable
+    from .parser import is_parseable, parse_file
 
     # One persistent event loop in a background thread — avoids recreating
     # the loop (and httpx connection pool) on every file-save event.

@@ -4,13 +4,13 @@ import sys
 from pathlib import Path
 
 import click
+from rich import box
 from rich.console import Console
 from rich.table import Table
-from rich import box
 from rich.text import Text
 
 from .checker import PackageResult, run_checks
-from .parser import parse_file, parse_stdin
+from .parser import parse_file
 
 # Force UTF-8 on Windows terminals so Unicode symbols render correctly
 if sys.platform == "win32":
@@ -155,7 +155,8 @@ def check(file: str, as_json: bool, quiet: bool) -> None:
         packages, kind = parse_file(path)
 
     if not as_json and not quiet:
-        err_console.print(f"[dim]Parsed as [bold]{kind}[/bold] — found {len(packages)} package name(s)[/dim]")
+        msg = f"[dim]Parsed as [bold]{kind}[/bold] — found {len(packages)} package name(s)[/dim]"
+        err_console.print(msg)
 
     raise SystemExit(_run(packages, as_json, quiet))
 
@@ -179,7 +180,8 @@ def scan(file: str, as_json: bool, quiet: bool) -> None:
         packages, kind = parse_file(path)
 
     if not as_json and not quiet:
-        err_console.print(f"[dim]Scanned [bold]{file}[/bold] as {kind} — found {len(packages)} import(s)[/dim]")
+        msg = f"[dim]Scanned [bold]{file}[/bold] as {kind} — found {len(packages)} import(s)[/dim]"
+        err_console.print(msg)
 
     raise SystemExit(_run(packages, as_json, quiet))
 
@@ -237,7 +239,9 @@ def setup_hook(hook_type: str) -> None:
         if config_path.exists():
             existing = config_path.read_text(encoding="utf-8")
             if "pkghall" in existing:
-                console.print("[yellow]pkghall hook already present in .pre-commit-config.yaml[/yellow]")
+                console.print(
+                    "[yellow]pkghall hook already present in .pre-commit-config.yaml[/yellow]"
+                )
                 return
             with config_path.open("a", encoding="utf-8") as f:
                 f.write(hook_snippet)

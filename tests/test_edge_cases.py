@@ -5,10 +5,8 @@ These cover inputs that are tricky to parse correctly in real-world usage.
 import textwrap
 from pathlib import Path
 
-import pytest
-
-from pkghall.parser import parse_python_imports, parse_requirements, parse_file, parse_stdin
 from pkghall.checker import PackageResult
+from pkghall.parser import parse_file, parse_python_imports, parse_requirements, parse_stdin
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

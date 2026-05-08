@@ -1,4 +1,5 @@
 import pytest
+
 from pkghall.checker import PackageResult, run_checks
 
 

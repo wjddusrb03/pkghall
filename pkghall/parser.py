@@ -66,7 +66,8 @@ def parse_file(path: Path) -> tuple[list[str], str]:
     if name in ("requirements.txt", "requirements-dev.txt", "requirements-test.txt") or (
         suffix == ".txt" and "require" in name
     ):
-        return parse_requirements(path.read_text(encoding="utf-8", errors="replace")), "requirements"
+        content = path.read_text(encoding="utf-8", errors="replace")
+        return parse_requirements(content), "requirements"
 
     if suffix == ".txt":
         # Try as requirements first, fall back to python

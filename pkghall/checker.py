@@ -6,10 +6,9 @@ import asyncio
 import re
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
-
 
 PYPI_URL = "https://pypi.org/pypi/{package}/json"
 PYPI_STATS_URL = "https://pypistats.org/api/packages/{package}/recent"
@@ -80,13 +79,13 @@ async def _check_one(client: httpx.AsyncClient, name: str) -> PackageResult:
                 upload_time = f.get("upload_time")
                 if upload_time:
                     try:
-                        dt = datetime.fromisoformat(upload_time).replace(tzinfo=timezone.utc)
+                        dt = datetime.fromisoformat(upload_time).replace(tzinfo=UTC)
                         if oldest is None or dt < oldest:
                             oldest = dt
                     except ValueError:
                         pass
         if oldest is not None:
-            age_days = (datetime.now(timezone.utc) - oldest).days
+            age_days = (datetime.now(UTC) - oldest).days
 
         return PackageResult(
             name=name,

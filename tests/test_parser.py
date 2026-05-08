@@ -1,6 +1,6 @@
 from pathlib import Path
-import pytest
-from pkghall.parser import parse_python_imports, parse_requirements, parse_file
+
+from pkghall.parser import parse_file, parse_python_imports, parse_requirements
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
