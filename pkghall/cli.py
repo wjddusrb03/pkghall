@@ -263,22 +263,21 @@ def setup_hook(hook_type: str) -> None:
             raise SystemExit(1)
 
         hook_path = hooks_dir / "pre-commit"
+        # Use while-read instead of xargs so filenames with spaces are handled safely.
         script = (
             "#!/bin/sh\n"
             "# pkghall: check for hallucinated packages before commit\n"
             "set -e\n\n"
-            "# Find staged requirements files\n"
-            "REQ=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'requirements.*\\.txt$' || true)\n"
-            "if [ -n \"$REQ\" ]; then\n"
-            "  echo \"[pkghall] Checking staged requirements files...\"\n"
-            "  echo \"$REQ\" | xargs pkghall check --quiet\n"
-            "fi\n\n"
-            "# Find staged Python files\n"
-            "PY=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\\.py$' || true)\n"
-            "if [ -n \"$PY\" ]; then\n"
-            "  echo \"[pkghall] Scanning staged Python files...\"\n"
-            "  echo \"$PY\" | xargs pkghall scan --quiet\n"
-            "fi\n"
+            "git diff --cached --name-only --diff-filter=ACM | grep -E 'requirements.*\\.txt$' |"
+            " while IFS= read -r f; do\n"
+            "  echo \"[pkghall] checking $f\"\n"
+            "  pkghall check --quiet \"$f\"\n"
+            "done\n\n"
+            "git diff --cached --name-only --diff-filter=ACM | grep -E '\\.py$' |"
+            " while IFS= read -r f; do\n"
+            "  echo \"[pkghall] scanning $f\"\n"
+            "  pkghall scan --quiet \"$f\"\n"
+            "done\n"
         )
 
         if hook_path.exists():

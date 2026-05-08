@@ -37,12 +37,14 @@ class PackageResult:
         """Flag as suspicious when it exists but looks shady."""
         if not self.exists:
             return False
-        if self.age_days is not None and self.age_days < 30:
-            return True
-        if self.downloads_last_month is not None and self.downloads_last_month < 100:
-            if self.age_days is not None and self.age_days < 180:
-                return True
-        return False
+        too_new = self.age_days is not None and self.age_days < 30
+        low_traffic = (
+            self.downloads_last_month is not None
+            and self.downloads_last_month < 100
+            and self.age_days is not None
+            and self.age_days < 180
+        )
+        return too_new or low_traffic
 
     @property
     def looks_hallucinated(self) -> bool:
@@ -70,20 +72,20 @@ async def _check_one(client: httpx.AsyncClient, name: str) -> PackageResult:
         info = data.get("info", {})
         releases = data.get("releases", {})
 
-        # Age from first published release
+        # Age from first published release — track running minimum to avoid building a list
         age_days: int | None = None
-        all_dates: list[datetime] = []
+        oldest: datetime | None = None
         for release_files in releases.values():
             for f in release_files:
                 upload_time = f.get("upload_time")
                 if upload_time:
                     try:
                         dt = datetime.fromisoformat(upload_time).replace(tzinfo=timezone.utc)
-                        all_dates.append(dt)
+                        if oldest is None or dt < oldest:
+                            oldest = dt
                     except ValueError:
                         pass
-        if all_dates:
-            oldest = min(all_dates)
+        if oldest is not None:
             age_days = (datetime.now(timezone.utc) - oldest).days
 
         return PackageResult(

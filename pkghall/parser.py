@@ -35,12 +35,7 @@ def parse_python_imports(source: str) -> list[str]:
         for m in re.finditer(r"^(?:import|from)\s+([\w.]+)", source, re.MULTILINE):
             packages.add(m.group(1))
 
-    result: list[str] = []
-    for pkg in sorted(packages):
-        if not _is_stdlib(pkg):
-            result.append(_normalize(pkg))
-
-    return sorted(set(result))
+    return sorted({_normalize(pkg) for pkg in packages if not _is_stdlib(pkg)})
 
 
 def parse_requirements(source: str) -> list[str]:
@@ -82,6 +77,13 @@ def parse_file(path: Path) -> tuple[list[str], str]:
         return parse_python_imports(content), "python"
 
     return [], "unknown"
+
+
+def is_parseable(path: Path) -> bool:
+    """Return True if pkghall can meaningfully scan this file for package names."""
+    suffix = path.suffix.lower()
+    name = path.name.lower()
+    return suffix == ".py" or (suffix == ".txt" and "require" in name)
 
 
 def parse_stdin(content: str) -> tuple[list[str], str]:
