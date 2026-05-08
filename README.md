@@ -68,15 +68,27 @@ Attackers register these names to intercept installs from AI-assisted developers
 
 ## Use as a pre-commit hook
 
+Add to `.pre-commit-config.yaml`:
+
 ```yaml
-# .pre-commit-config.yaml
 repos:
   - repo: https://github.com/wjddusrb03/pkghall
     rev: v0.1.0
     hooks:
-      - id: pkghall
-        args: [check]
-        files: requirements.*\.txt$
+      - id: pkghall-check   # checks requirements*.txt files
+      - id: pkghall-scan    # scans Python source files
+```
+
+Then run:
+
+```bash
+pre-commit install
+```
+
+Or install automatically with the built-in command:
+
+```bash
+pkghall setup-hook
 ```
 
 ## Suspicious package detection
