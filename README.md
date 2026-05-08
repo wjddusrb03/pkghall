@@ -30,7 +30,12 @@ Hallucinated packages:
 ## Install
 
 ```bash
-pip install pkghall
+git clone https://github.com/wjddusrb03/pkghall.git
+cd pkghall
+pip install -e .
+
+# With watch mode support
+pip install -e ".[watch]"
 ```
 
 ## Usage
